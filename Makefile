@@ -1,7 +1,7 @@
 MD_FILES = $(shell \
 				find ./content/pages -type f -name \*.md | \
 				grep -v index.md | grep -v format.md | sort)
-
+MEDIA_FILES = $(shell ls -c ./content/pages/media/*.jp*g)
 
 THEME = "default"
 TH_HEADER = ./theme/${THEME}/header.html
@@ -52,7 +52,7 @@ css:
 
 media:
 	@echo "- Optimizing Media files"; \
-		jpegoptim -fos -d ${SITE}/media/ ./content/pages/media/{*.jpg,*.jpeg} 
+		jpegoptim -fos -d ${SITE}/media/ ${MEDIA_FILES}
 
 index:
 	@echo "- Generating the index page"

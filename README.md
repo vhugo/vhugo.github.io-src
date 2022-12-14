@@ -18,6 +18,12 @@ On Mac:
 brew install pandoc jpegoptim
 ```
 
+On Android (via Termux):
+
+```sh
+pkg install make pandoc jpegoptim
+```
+
 ## Usage
 
 ```sh
