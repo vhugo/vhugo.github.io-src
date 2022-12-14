@@ -12,6 +12,12 @@ On Arch:
 sudo pacman -Sy pandoc jpegoptim
 ```
 
+On Mac:
+
+```sh
+brew install pandoc jpegoptim
+```
+
 ## Usage
 
 ```sh
