@@ -18,8 +18,41 @@ local function escape(s, in_attribute)
     end)
 end
 
+local function date_output(s)
+      p = pandoc.read("**".. s .."**")
+      return pandoc.utils.blocks_to_inlines(p.blocks)
+end
+
+
+local arvelie_start_year = 2022
+
+local function date_format(s)
+    pattern = "(%d%d%d%d)(%d%d)(%d%d)$"
+    year, month, day=s:match(pattern)
+
+    date = os.time{year=year, month=month, day=day}
+    yday = os.date("*t",date).yday
+
+    arvelie_year = year - arvelie_start_year
+    if yday >= 365 then
+      return date_output(string.format("%02d+%02d", arvelie_year, yday-365 ))
+    end
+
+    arvelie_month = math.floor((yday - 0.0001) / 14)
+    arvelie_letter = arvelie_month + string.byte("A")
+    arvelie_day = yday - arvelie_month * 14
+
+    out = string.format("%02d%s%02d", arvelie_year, string.char(arvelie_letter), arvelie_day)
+    return date_output(out)
+end
+
 function Writer (doc, opts)
   local filter = {
+    Str = function (content)
+      if content.text:find("++", 1, true) == 1 then
+        return date_format(content.text)
+      end
+    end,
     Link = function (link)
       -- external URL will open on a new tab/window
       if link.target:find("http", 1, true) == 1 then
@@ -49,7 +82,9 @@ function Writer (doc, opts)
     BlockQuote = function (bq)
       local buff = {}
       table.insert(buff, pandoc.RawInline('html','<article>'))
-      table.insert(buff, pandoc.utils.blocks_to_inlines(bq.content))
+      for _, line in pairs(bq.content) do
+        table.insert(buff, line)
+      end
       table.insert(buff, pandoc.RawInline('html','</article>'))
       return buff
     end,
