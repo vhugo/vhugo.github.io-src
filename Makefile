@@ -16,6 +16,9 @@ WRITER_LUA = pandoc-writer.lua
 TEST_FORMAT_MD = ./content/pages/format.md
 TEST_FORMAT_HTML = ${SITE}/format.html
 
+COMMIT = $(shell git rev-parse --short HEAD)
+BUILD_DATE := $(shell date +'%Y.%m.%d') 
+
 all: clean build index css media check-html
 
 test:
@@ -25,7 +28,9 @@ test:
 	echo "<main>" >> ${TEST_FORMAT_HTML}; \
 	pandoc -t ${WRITER_LUA} ${TEST_FORMAT_MD} >> ${TEST_FORMAT_HTML}; \
 	echo "</main>" >> ${TEST_FORMAT_HTML}; \
-	cat ${TH_FOOTER} >> ${TEST_FORMAT_HTML}
+	sed 's/{{BUILD_DATE}}/'"${BUILD_DATE}"'/' ${TH_FOOTER} | \
+		sed 's/{{COMMIT}}/'"${COMMIT}"'/g' | \
+		sed 's/{{YEAR}}/'"$(shell date +'%Y')"'/' >> ${TEST_FORMAT_HTML}
 
 page:
 	@read -p "new page name: " PAGE_NAME; \
@@ -68,7 +73,9 @@ index:
 	pandoc ./content/pages/index.md >> ${INDEX_HTML}; \
 	pandoc ${SITE}/index.txt >> ${INDEX_HTML}; \
 	echo "</main>" >> ${INDEX_HTML}; \
-	cat ${TH_FOOTER} >> ${INDEX_HTML}; \
+	sed 's/{{BUILD_DATE}}/'"${BUILD_DATE}"'/' ${TH_FOOTER} | \
+		sed 's/{{COMMIT}}/'"${COMMIT}"'/g' | \
+		sed 's/{{YEAR}}/'"$(shell date +'%Y')"'/' >> ${INDEX_HTML}; \
 	rm ${SITE}/index.txt
 
 build:
@@ -81,7 +88,9 @@ build:
 		echo "<main>" >> ${SITE}/$$HTML_FILE; \
 		pandoc -t ${WRITER_LUA} $$markdown >> ${SITE}/$$HTML_FILE; \
 		echo "</main>" >> ${SITE}/$$HTML_FILE; \
-		cat ${TH_FOOTER} >> ${SITE}/$$HTML_FILE; \
+		sed 's/{{BUILD_DATE}}/'"${BUILD_DATE}"'/' ${TH_FOOTER} | \
+			sed 's/{{COMMIT}}/'"${COMMIT}"'/g' | \
+			sed 's/{{YEAR}}/'"$(shell date +'%Y')"'/' >> ${SITE}/$$HTML_FILE; \
 	done
 
 check-html:
